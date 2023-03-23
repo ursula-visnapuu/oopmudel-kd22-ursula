@@ -61,34 +61,30 @@ class SeriesCircuit {
     }
 }
 
-let sc1: SeriesCircuit = new SeriesCircuit();
-sc1.push(new Resistor(220));
-sc1.push(new Resistor(110));
-sc1.push(new Resistor(220));
+class ParalellCircuit {
+    resistors: Resistor[] = []
+    push(r: Resistor) {
+        this.resistors.push(r);
+    }
+    getTotalResistance(): number {
+        let inversesum: number = 0;
+        this.resistors.forEach((resistor) => {
+            inversesum += 1 / resistor.getResistance()
+        })
+        return 1/inversesum;
+    }
+    getCurrent(u: number) {
+        return u / this.getTotalResistance();
+    }
 
+    getTotalPower(u: number){
+        return u * this.getCurrent(u)
+    }
+}
+
+let sc1: ParalellCircuit = new ParalellCircuit();
+sc1.push(new Resistor(4.5));
+sc1.push(new Resistor(9));
+console.log(sc1.getTotalPower(4.5));
 console.log(sc1.getTotalResistance());
-console.log(sc1.getCurrent(12));
-console.log(sc1.getTotalPower(12))
-console.log(sc1.getBiggestResistance())
-console.log(sc1.getBiggestPotential(12))
-console.log(sc1.getBiggestPower(12))
-
-let sc2: SeriesCircuit = new SeriesCircuit();
-sc2.push(new Resistor(220));
-sc2.push(new Resistor(220));
-sc2.push(new Resistor(220));
-console.log(sc2.getTotalResistance());
-console.log(sc2.getCurrent(12));
-console.log(sc2.getTotalPower(12))
-console.log(sc2.getBiggestResistance())
-console.log(sc2.getBiggestPotential(12))
-console.log(sc2.getBiggestPower(12))
-
-let sc3: SeriesCircuit = new SeriesCircuit();
-sc3.push(new Resistor(100));
-sc3.push(new Resistor(200));
-console.log(sc3.getTotalResistance());
-console.log(sc3.getCurrent(5));
-console.log(sc3.getBiggestResistance())
-console.log(sc3.getBiggestPotential(5))
-console.log(sc3.getBiggestPower(5))
+console.log(sc1.getCurrent(4.5))
