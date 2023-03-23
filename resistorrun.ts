@@ -33,11 +33,6 @@ class Switch extends AbstractResistor {
         return super.getCurrent(u);
     }
 }
-
-function printResistance(r: AbstractResistor){
-    console.log(r.getResistance());
-}
-
 function getTotalResistance(elements: AbstractResistor[]){
     let totalResistance = 0
     elements.forEach((element) => {
