@@ -23,8 +23,9 @@ resistors = [r1, r2, r3]
 function controlResistorAllowed(resistors: Resistor[], u: number): Resistor[] {
     let allowedResistors: Resistor[] = []
     resistors.forEach((resistor) => {
-        if(resistor.getPower(u) <= resistor.allowedPower){allowedResistors.push(resistor);
-
+        if(resistor.getPower(u) <= resistor.allowedPower){
+            allowedResistors.push(resistor);
+        }
     })
     return allowedResistors
 }
