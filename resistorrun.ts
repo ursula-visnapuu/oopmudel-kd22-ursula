@@ -1,94 +1,53 @@
-abstract class AbstractResistor {
-    abstract getResistance(): number;
-    getCurrent(u: number): number{
-        return u/this.getResistance();
-    }
-}
+// function getCurrent(voltage: number, watts: number): number{
+//     return watts/voltage;
+// }
+//
+// function getCurrent2(voltage: number, resistance: number): number{
+//     return voltage/resistance;
+// }
+//
+// function maximumVoltage(resistanceOhms: number, powerMaximumWatts: number):number{
+//     //U*I=P
+//     //U/I=R
+//     //I=U/R
+//     //U*U/R=P
+//     //U*U=P*R
+//     //U=sqrt(P*R)
+//     return Math.sqrt(powerMaximumWatts*resistanceOhms);
+// }
+//
+// let maxVoltage = maximumVoltage(110, 0.25)
+// let maxCurrent = getCurrent(maxVoltage, 0.25)
+// console.log(maxVoltage);
+// console.log(maxCurrent);
+// let maxPower = maxCurrent * maxVoltage
+// console.log(maxPower)
+//
+// maxVoltage = maximumVoltage(4700, 1)
+// console.log(maxVoltage);
+//
+// let testCurrent = getCurrent2(5, 220)
+// console.log(testCurrent)
 
-class Resistor extends AbstractResistor {
+class Resistor {
     r: number = 0;
-    constructor(r: number) {
-        super();
+    maximumPower: number = 0
+    constructor(r: number, maximumPower: number) {
         this.r = r;
+        this.maximumPower = maximumPower
     }
-    getResistance(): number {
-        return this.r;
-    }
-}
-
-abstract class MultipleConnection extends AbstractResistor{
-    resistors: AbstractResistor[] = []
-    addResistor(r: AbstractResistor) {
-        this.resistors.push(r);
-    }
-}
-
-class ParallelConnection extends MultipleConnection{
-    getResistance(): number{
-        let inverseSum: number=0;
-        for(let resistor of this.resistors){
-            inverseSum+=1/resistor.getResistance();
-        }
-        return 1/inverseSum;
-    }
-
     getCurrent(u: number): number {
-        let currentSum: number=0;
-        for(let resistor of this.resistors){
-            currentSum += resistor.getCurrent(5);
-        }
-        return currentSum;
+        return u / this.r;
+    }
+
+    getPower(u: number): number {
+        return u * this.getCurrent(u)
+    }
+
+    getMaxVoltage(u: number): number {
+        return Math.sqrt(this.maximumPower * this.r);
     }
 }
 
-class SerialConnection extends MultipleConnection{
-    getResistance(): number{
-        let sum: number=0;
-        for(let resistor of this.resistors){
-            sum += resistor.getResistance();
-        }
-        return sum;
-    }
-}
-
-let p:ParallelConnection=new ParallelConnection();
-p.addResistor(new Resistor(220));
-p.addResistor(new Resistor(220));
-p.addResistor(new Resistor(110));
-console.log(p.getResistance());
-console.log(p.getCurrent(5));
-
-let p2:ParallelConnection=new ParallelConnection();
-p2.addResistor(new Resistor(110));
-p2.addResistor(new Resistor(110));
-console.log(p2.getResistance());
-
-let p3:ParallelConnection=new ParallelConnection();
-p3.addResistor(p);
-p3.addResistor(p2);
-console.log(p3.getResistance());
-
-let s1:SerialConnection=new SerialConnection();
-s1.addResistor(new Resistor(220));
-s1.addResistor(new Resistor(110));
-console.log(s1.getResistance());
-
-let s2:SerialConnection=new SerialConnection();
-s2.addResistor(new Resistor(220));
-s2.addResistor(new Resistor(440));
-console.log(s2.getResistance());
-
-let s3:SerialConnection=new SerialConnection();
-s3.addResistor(s1);
-s3.addResistor(s2);
-console.log(s3.getResistance());
-console.log(s3.getCurrent(12));
-
-
-let s4:SerialConnection=new SerialConnection();
-s4.addResistor(new Resistor(220));
-s4.addResistor(new Resistor(110));
-let p4:ParallelConnection=new ParallelConnection();
-p4.addResistor(s4)
-p4.addResistor(new Resistor(330))
-console.log(p4.getResistance());
+let r1: Resistor = new Resistor(110, 0.25);
+console.log(r1.getMaxVoltage(5));
