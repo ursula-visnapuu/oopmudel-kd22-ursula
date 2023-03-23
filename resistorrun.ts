@@ -83,3 +83,12 @@ console.log(sc2.getTotalPower(12))
 console.log(sc2.getBiggestResistance())
 console.log(sc2.getBiggestPotential(12))
 console.log(sc2.getBiggestPower(12))
+
+let sc3: SeriesCircuit = new SeriesCircuit();
+sc3.push(new Resistor(100));
+sc3.push(new Resistor(200));
+console.log(sc3.getTotalResistance());
+console.log(sc3.getCurrent(5));
+console.log(sc3.getBiggestResistance())
+console.log(sc3.getBiggestPotential(5))
+console.log(sc3.getBiggestPower(5))
