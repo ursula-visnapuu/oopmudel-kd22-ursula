@@ -1,53 +1,86 @@
-// function getCurrent(voltage: number, watts: number): number{
-//     return watts/voltage;
-// }
-//
-// function getCurrent2(voltage: number, resistance: number): number{
-//     return voltage/resistance;
-// }
-//
-// function maximumVoltage(resistanceOhms: number, powerMaximumWatts: number):number{
-//     //U*I=P
-//     //U/I=R
-//     //I=U/R
-//     //U*U/R=P
-//     //U*U=P*R
-//     //U=sqrt(P*R)
-//     return Math.sqrt(powerMaximumWatts*resistanceOhms);
-// }
-//
-// let maxVoltage = maximumVoltage(110, 0.25)
-// let maxCurrent = getCurrent(maxVoltage, 0.25)
-// console.log(maxVoltage);
-// console.log(maxCurrent);
-// let maxPower = maxCurrent * maxVoltage
-// console.log(maxPower)
-//
-// maxVoltage = maximumVoltage(4700, 1)
-// console.log(maxVoltage);
-//
-// let testCurrent = getCurrent2(5, 220)
-// console.log(testCurrent)
+import {subtle} from "crypto";
 
-class Resistor {
-    r: number = 0;
-    maximumPower: number = 0
-    constructor(r: number, maximumPower: number) {
-        this.r = r;
-        this.maximumPower = maximumPower
+class Resistor{
+    resistance: number;
+    maxPower: number;
+    constructor(resistance: number, maxPower: number){
+        this.resistance=resistance;
+        this.maxPower=maxPower;
     }
+    getMaxVoltage():number{
+        return Math.sqrt(this.resistance*this.maxPower);
+    }
+
+    getResistance(){
+        return this.resistance
+    }
+
     getCurrent(u: number): number {
-        return u / this.r;
+        return u / this.getResistance()
     }
 
     getPower(u: number): number {
         return u * this.getCurrent(u)
     }
+}
 
-    getMaxVoltage(u: number): number {
-        return Math.sqrt(this.maximumPower * this.r);
+class ParallelCircuit{
+    resistors: Resistor[] = [];
+    push(r: Resistor) {
+        this.resistors.push(r);
+    }
+    getMaxVoltage():number{
+        if(this.resistors.length==0){throw new Error("No resistors");}
+        let maxVoltage=this.resistors[0].getMaxVoltage();
+        for(let r of this.resistors){
+            if(r.getMaxVoltage()<maxVoltage){maxVoltage=r.getMaxVoltage();}
+        }
+        return maxVoltage;
+    }
+
+    getResistance(): number{
+        let inverseSum: number=0;
+        for(let resistor of this.resistors){
+            inverseSum+=1/resistor.getResistance();
+        }
+        return 1/inverseSum;
+    }
+
+    getCurrent(u: number): number{
+        let currentSum: number = 0
+        for(let resistor of this.resistors){
+            currentSum += resistor.getCurrent(u)
+        }
+        return currentSum
+    }
+
+    getPower(u: number): number{
+        return this.getCurrent(u) * u
     }
 }
 
-let r1: Resistor = new Resistor(110, 0.25);
-console.log(r1.getMaxVoltage(5));
+function getCurrents(resistors: Resistor[]) : number[]{
+    let currents:number[]=[];
+    for(let i=0; i<resistors.length; i++){
+        currents.push(resistors[i].getCurrent(5));
+    }
+    return currents;
+}
+
+function getPowers(resistors: Resistor[]) : number[]{
+    let currents:number[]=[];
+    for(let i=0; i<resistors.length; i++){
+        currents.push(resistors[i].getPower(5));
+    }
+    return currents;
+}
+
+let ps1=new ParallelCircuit();
+ps1.push(new Resistor(220, 0.5));
+ps1.push(new Resistor(220, 0.5));
+ps1.push(new Resistor(110, 0.25));
+console.log(ps1.getMaxVoltage());
+console.log(ps1.getResistance());
+console.log(ps1.getCurrent(5));
+console.log(getCurrents(ps1.resistors))
+console.log(getPowers(ps1.resistors));
