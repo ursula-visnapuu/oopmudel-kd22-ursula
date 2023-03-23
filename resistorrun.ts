@@ -16,38 +16,79 @@ class Resistor extends AbstractResistor {
     }
 }
 
-class Switch extends AbstractResistor {
-    on: boolean = false;
-    setOn(state: boolean){
-        this.on=state;
+abstract class MultipleConnection extends AbstractResistor{
+    resistors: AbstractResistor[] = []
+    addResistor(r: AbstractResistor) {
+        this.resistors.push(r);
     }
-    getResistance(): number {
-        return (this.on ? 0 : 1000000000);
-    }
-    getCurrent(u: number): number{
-        if(u>0){
-            if(this.on){
-                throw new Error("Short circuit");
-            }
+}
+
+class ParallelConnection extends MultipleConnection{
+    getResistance(): number{
+        let inverseSum: number=0;
+        for(let resistor of this.resistors){
+            inverseSum+=1/resistor.getResistance();
         }
-        return super.getCurrent(u);
+        return 1/inverseSum;
+    }
+
+    getCurrent(u: number): number {
+        let currentSum: number=0;
+        for(let resistor of this.resistors){
+            currentSum += resistor.getCurrent(5);
+        }
+        return currentSum;
     }
 }
-function getTotalResistance(elements: AbstractResistor[]){
-    let totalResistance = 0
-    elements.forEach((element) => {
-        totalResistance += element.getResistance()
-    })
-    console.log(totalResistance)
+
+class SerialConnection extends MultipleConnection{
+    getResistance(): number{
+        let sum: number=0;
+        for(let resistor of this.resistors){
+            sum += resistor.getResistance();
+        }
+        return sum;
+    }
 }
 
-let r1: Switch = new Switch();
-let r2: AbstractResistor = new Resistor(220);
-let elements = []
-elements.push(r1)
-elements.push(r2)
-r1.setOn(true);
-getTotalResistance(elements)
+let p:ParallelConnection=new ParallelConnection();
+p.addResistor(new Resistor(220));
+p.addResistor(new Resistor(220));
+p.addResistor(new Resistor(110));
+console.log(p.getResistance());
+console.log(p.getCurrent(5));
 
-r1.setOn(false);
-getTotalResistance(elements)
+let p2:ParallelConnection=new ParallelConnection();
+p2.addResistor(new Resistor(110));
+p2.addResistor(new Resistor(110));
+console.log(p2.getResistance());
+
+let p3:ParallelConnection=new ParallelConnection();
+p3.addResistor(p);
+p3.addResistor(p2);
+console.log(p3.getResistance());
+
+let s1:SerialConnection=new SerialConnection();
+s1.addResistor(new Resistor(220));
+s1.addResistor(new Resistor(110));
+console.log(s1.getResistance());
+
+let s2:SerialConnection=new SerialConnection();
+s2.addResistor(new Resistor(220));
+s2.addResistor(new Resistor(440));
+console.log(s2.getResistance());
+
+let s3:SerialConnection=new SerialConnection();
+s3.addResistor(s1);
+s3.addResistor(s2);
+console.log(s3.getResistance());
+console.log(s3.getCurrent(12));
+
+
+let s4:SerialConnection=new SerialConnection();
+s4.addResistor(new Resistor(220));
+s4.addResistor(new Resistor(110));
+let p4:ParallelConnection=new ParallelConnection();
+p4.addResistor(s4)
+p4.addResistor(new Resistor(330))
+console.log(p4.getResistance());
